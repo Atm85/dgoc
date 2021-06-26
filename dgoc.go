@@ -3,6 +3,7 @@ package dgoc
 import (
 	"fmt"
 	"reflect"
+	"strings"
 
 	"github.com/bwmarrin/discordgo"
 )
@@ -31,6 +32,14 @@ func (dg *DGOC) AddCommand(commands ...interface{}) error {
 		if !t.Implements(i) {
 			return fmt.Errorf("error: command %v does not implement %v", t, i)
 		}
+
+		// t.String = *package.Name
+		//
+		// here we split 't.String()'
+		// and extract the command Name
+		// and convert it to lowercase
+		name := strings.ToLower(strings.Split(t.String(), ".")[1])
+		CommandMap[name] = command
 	}
 
 	return nil
