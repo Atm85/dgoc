@@ -8,7 +8,8 @@ import (
 )
 
 type DGOC struct {
-	Session *discordgo.Session
+	Session    *discordgo.Session
+	CommandMap map[string]*Command
 }
 
 // New initializes the dgoc command handler
@@ -19,11 +20,16 @@ func New(session *discordgo.Session) *DGOC {
 // AddCommand add a command(s) to the dgoc command map
 func (dg *DGOC) AddCommand(commands ...interface{}) error {
 	for _, command := range commands {
+
 		i := reflect.TypeOf((*Command)(nil)).Elem()
 		t := reflect.TypeOf(command)
-		value := t.Implements(i)
-		if !value {
-			return fmt.Errorf("error: command %s does not implement %s", t, i)
+
+		if t.Kind() != reflect.Ptr {
+			return fmt.Errorf("error: command %v is not a pointer", t)
+		}
+
+		if !t.Implements(i) {
+			return fmt.Errorf("error: command %v does not implement %v", t, i)
 		}
 	}
 
