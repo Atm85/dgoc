@@ -1,6 +1,11 @@
 package dgoc
 
-import "github.com/bwmarrin/discordgo"
+import (
+	"fmt"
+	"reflect"
+
+	"github.com/bwmarrin/discordgo"
+)
 
 type DGOC struct {
 	Session *discordgo.Session
@@ -12,8 +17,15 @@ func New(session *discordgo.Session) *DGOC {
 }
 
 // AddCommand add a command(s) to the dgoc command map
-func (dg *DGOC) AddCommand(commands ...interface{}) {
+func (dg *DGOC) AddCommand(commands ...interface{}) error {
 	for _, command := range commands {
-		_ = command
+		i := reflect.TypeOf((*Command)(nil)).Elem()
+		t := reflect.TypeOf(command)
+		value := t.Implements(i)
+		if !value {
+			return fmt.Errorf("error: command %s does not implement %s", t, i)
+		}
 	}
+
+	return nil
 }
