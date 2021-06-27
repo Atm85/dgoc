@@ -8,6 +8,20 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
+var (
+	userid      string
+	prefix      string
+	defaultHelp bool = true
+)
+
+func SetPrefix(p string) {
+	prefix = p
+}
+
+func UseDefaultHelp(value bool) {
+	defaultHelp = value
+}
+
 type DGOC struct {
 	Session    *discordgo.Session
 	CommandMap map[string]*Command
@@ -15,6 +29,11 @@ type DGOC struct {
 
 // New initializes the dgoc command handler
 func New(session *discordgo.Session) *DGOC {
+
+	bot, _ := session.User("@me")
+	userid = bot.ID
+
+	session.AddHandler(OnMessage)
 	return &DGOC{Session: session}
 }
 
