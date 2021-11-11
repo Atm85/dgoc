@@ -1,10 +1,8 @@
 package dgoc
 
 import (
-	"reflect"
-	"strings"
-
 	"github.com/bwmarrin/discordgo"
+	"strings"
 )
 
 func OnMessage(s *discordgo.Session, m *discordgo.MessageCreate) {
@@ -29,13 +27,15 @@ func OnMessage(s *discordgo.Session, m *discordgo.MessageCreate) {
 		return
 	}
 
-	v := reflect.ValueOf(command)
-	context := v.Elem().FieldByName("Ctx")
-	if context.IsValid() {
-		ctx := &Context{}
-		context.Set(reflect.ValueOf(ctx))
+	// set command context
+	ctx := &Context{
+
+		Name: name,
+
+		Session: s,
+		Message: m.Message,
 	}
 
 	// run command
-	command.(Command).Execute(append(args[:0], args[0+1:]...))
+	command.(Command).Execute(ctx, append(args[:0], args[0+1:]...))
 }
