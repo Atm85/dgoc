@@ -24,7 +24,7 @@ func UseDefaultHelp(value bool) {
 
 type DGOC struct {
 	Session    *discordgo.Session
-	CommandMap map[string]*Command
+	CommandMap map[string]*ICommand
 }
 
 // New initializes the dgoc command handler
@@ -39,9 +39,10 @@ func New(session *discordgo.Session) *DGOC {
 
 // AddCommand add a command(s) to the dgoc command map
 func (dg *DGOC) AddCommand(commands ...interface{}) error {
+
 	for _, command := range commands {
 
-		i := reflect.TypeOf((*Command)(nil)).Elem()
+		i := reflect.TypeOf((*ICommand)(nil)).Elem()
 		t := reflect.TypeOf(command)
 
 		if t.Kind() != reflect.Ptr {
@@ -58,7 +59,22 @@ func (dg *DGOC) AddCommand(commands ...interface{}) error {
 		// and extract the command Name
 		// and convert it to lowercase
 		name := strings.ToLower(strings.Split(t.String(), ".")[1])
-		CommandMap[name] = command
+
+		// get command description from ICommand interface object
+		command.(ICommand).Prepare()
+
+		v := reflect.ValueOf(command)
+		f := v.Elem().FieldByName("Desc")
+		desc := ""
+		if f.IsValid() {
+			desc = f.String()
+		}
+
+		CommandMap[name] = &Command{
+			Name:     name,
+			Desc:     desc,
+			Executor: command,
+		}
 	}
 
 	return nil

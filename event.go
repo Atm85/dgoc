@@ -37,5 +37,5 @@ func OnMessage(s *discordgo.Session, m *discordgo.MessageCreate) {
 	}
 
 	// run command
-	command.(Command).Execute(ctx, append(args[:0], args[0+1:]...))
+	command.Executor.(ICommand).Execute(ctx, append(args[:0], args[0+1:]...))
 }
