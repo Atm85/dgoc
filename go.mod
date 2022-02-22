@@ -1,4 +1,4 @@
-module github.com/iAtomPlaza/dgoc
+module github.com/atm85/dgoc
 
 go 1.16
 
